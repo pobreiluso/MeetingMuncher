@@ -1,0 +1,4 @@
+requests
+python-docx
+openai
+ffmpeg-python
