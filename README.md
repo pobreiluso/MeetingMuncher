@@ -56,18 +56,7 @@ Set your OpenAI API key as an environment variable:
 
 Example output:
 
-```Beginning video transcription process for run d1284eee-2ada-4215-b23a-1061ad5fb104
-Downloading video:   0%|                                                                                                                                                              | 0/100 [00:00<?, ?%Downloading video: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:03<00:00, 26.15%Downloading video: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:03<00:00, 26.15%/s]
-Extracting audio: 100%|█████████████████████████████████████████████| 100/100 [00:01<00:00, 65.02%/s]
-Transcribing Audio: 100%|███████████████████████████████████████████| 100/100 [00:06<00:00, 15.11%/s]
-Traceback (most recent call last):
-  File "/Users/ajerez/Documents/work/taylorbox/MeetingMuncher/meeting_minutes.py", line 215, in <module>
-
-  File "/Users/ajerez/Documents/work/taylorbox/MeetingMuncher/meeting_minutes.py", line 183, in main
-
-AttributeError: 'dict' object has no attribute 'meeting_title'
-❯ python3 meeting_minutes.py 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 https://www.youtube.com/watch\?v\=H5v3kku4y6Q
-Beginning video transcription process for run 2109d5e2-88d5-43fe-8eca-0e8ade4c09e1
+```Beginning video transcription process for run 2109d5e2-88d5-43fe-8eca-0e8ade4c09e1
 Downloading video: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:03<00:00, 26.01%/s]
 Extracting audio: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:01<00:00, 70.98%/s]
 Transcribing Audio: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:06<00:00, 14.75%/s]
