@@ -5,19 +5,42 @@ import subprocess
 from docx import Document
 import openai
 import webbrowser
+from pytube import YouTube
+import uuid
+from tqdm import tqdm  # Import tqdm for progress bars
+from rich.progress import Progress  # Import Progress for a more stylish output
+import json
+from slugify import slugify
 
+
+if len(sys.argv) >= 4:
+    custom_output_filename = sys.argv[3]
+else:
+    custom_output_filename = random_uuid = str(uuid.uuid4())
+
+# Generate filenames with different extensions
+video_filename = os.path.join('downloads', f'{custom_output_filename}.mp4')
+audio_filename = os.path.join('downloads', f'{custom_output_filename}.mp3')
+#document_filename = os.path.join('downloads', f'{custom_output_filename}.docx')
+#json_filename= os.path.join('downloads', f'{custom_output_filename}.json')
 
 class AudioTranscriptionService:
     def __init__(self, model="whisper-1"):
         self.model = model
 
     def transcribe(self, audio_file_path):
-        with open(audio_file_path, 'rb') as audio_file:
-            transcription = openai.audio.transcriptions.create(
-                model=self.model,
-                file=audio_file
-            )
-        return transcription.text
+        with tqdm(total=100, unit="%", desc="Transcribing Audio") as progress_bar:
+            try:
+                with open(audio_file_path, 'rb') as audio_file:
+                    audio_content = audio_file.read()
+                    transcription = openai.audio.transcriptions.create(
+                        model=self.model,
+                        file=audio_file
+                    )                
+                    return transcription.text
+
+            finally:
+                progress_bar.update(100)
 
 
 class MeetingAnalyzer:
@@ -35,6 +58,9 @@ class MeetingAnalyzer:
 
     def analyze_sentiment(self):
         return self._get_openai_response("analyze the sentiment of the following text", message_key='message')
+    
+    def gen_title(self):
+        return self._get_openai_response("generate a title for the transcription.")
 
     def _get_openai_response(self, task_description, message_key='message.content'):
         response = openai.chat.completions.create(
@@ -65,40 +91,70 @@ class VideoDownloader:
     def download_from_google_drive(drive_url):
         file_id = drive_url.split('/')[-2]
         direct_download_url = f'https://drive.google.com/uc?id={file_id}&export=download'
-        local_filename = 'downloaded_video.mp4'
         with requests.get(direct_download_url, stream=True) as r:
             r.raise_for_status()
-            with open(local_filename, 'wb') as f:
+            with open(video_filename, 'wb') as f:
                 for chunk in r.iter_content(chunk_size=8192):
                     f.write(chunk)
-        return local_filename
+        return video_filename
+
+    @staticmethod
+    def download_from_youtube(youtube_url):
+        yt = YouTube(youtube_url)
+        yt = yt.streams.get_highest_resolution()
+        try:
+            yt.download(filename=video_filename)
+        except:
+            print("Hubo un error al descargar el video del URL proporcionado...")
+
+        return video_filename
+
+    @staticmethod
+    def autodetect_download_source(url):
+        with tqdm(total=100, unit="%", desc="Downloading video") as progress_bar:
+            try:
+                if 'drive.google.com' in url:
+                    return VideoDownloader.download_from_google_drive(url)
+                elif 'youtube.com' in url:
+                    return VideoDownloader.download_from_youtube(url)
+                else:
+                    return url  # assume local file
+            except subprocess.CalledProcessError as e:
+                print(f"Error during audio extraction: {e.stderr.decode()}")
+                return None
+            finally:
+                progress_bar.update(100)
 
 
 class AudioExtractor:
     @staticmethod
     def extract_audio(input_video, bitrate='56k'):
-        print(f"Extracting audio from {input_video}...")
-        output_audio = input_video.replace('.mp4', '.mp3')
-        if os.path.exists(output_audio):
+        if os.path.exists(audio_filename):
             answer = input(
                 "Output audio file already exists. Delete it? (yes/no): ")
             if answer.lower() == 'yes':
-                print(f"Deleting {output_audio}...")
-                os.remove(output_audio)
+                print(f"Deleting {audio_filename}...")
+                os.remove(audio_filename)
             else:
-                print("Audio extraction cancelled by user.")
-                return output_audio
+                return audio_filename
 
-        print("Starting audio extraction with ffmpeg...")
-        subprocess.run([
-            'ffmpeg',
-            '-i', input_video,
-            '-b:a', bitrate,
-            '-vn',
-            output_audio
-        ], check=True)
-        print(f"Audio successfully extracted to {output_audio}")
-        return output_audio
+        # Use tqdm to display a progress bar during audio extraction
+        with tqdm(total=100, unit="%", desc="Extracting audio") as progress_bar:
+            try:
+                subprocess.run([
+                    'ffmpeg',
+                    '-i', input_video,
+                    '-b:a', bitrate,
+                    '-vn',
+                    audio_filename
+                ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+            except subprocess.CalledProcessError as e:
+                print(f"Error during audio extraction: {e.stderr.decode()}")
+                return None
+            finally:
+                progress_bar.update(100)
+        
+        return audio_filename
 
 
 def login_with_google():
@@ -106,38 +162,50 @@ def login_with_google():
 
 
 def main(api_key, file_path):
-    try:
-        print("Beginning video transcription process...")
 
-        # login_with_google()
-        audio_file = AudioExtractor.extract_audio(file_path)
-        print("Audio extracted, starting transcription...")
+    print("Beginning video transcription process for run %s" %
+          (custom_output_filename))
 
-        transcription_text = AudioTranscriptionService().transcribe(audio_file)
-        print("Transcription completed.")
+    video_file = VideoDownloader.autodetect_download_source(
+            file_path)
+    # Use tqdm to display a progress bar while extracting audio
+    audio_file = AudioExtractor.extract_audio(video_file)
+    transcription_text = AudioTranscriptionService().transcribe(audio_file)
+    analyzer = MeetingAnalyzer(transcription_text)
+    
+    meeting_info = {
+        'meeting_title': analyzer.gen_title(),
+        'abstract_summary': analyzer.summarize(),
+        'key_points': analyzer.extract_key_points(),
+        'action_items': analyzer.extract_action_items(),
+        'sentiment': analyzer.analyze_sentiment()
+    }
 
-        print("Analyzing transcription...")
-        analyzer = MeetingAnalyzer(transcription_text)
-        meeting_info = {
-            'abstract_summary': analyzer.summarize(),
-            'key_points': analyzer.extract_key_points(),
-            'action_items': analyzer.extract_action_items(),
-            'sentiment': analyzer.analyze_sentiment()
-        }
-        print("Analysis completed.")
+    document_filename = os.path.join('downloads', f'{slugify(meeting_info["meeting_title"])}.docx')
+    json_filename= os.path.join('downloads', f'{slugify(meeting_info["meeting_title"])}.json')
 
-        print("Saving analyzed information to document...")
-        DocumentManager.save_to_docx(
-            meeting_info, file_path.replace('.mp4', '.docx'))
+    # Save the meeting information to a JSON file
+    with open(json_filename, 'w') as json_file:
+        json.dump(meeting_info, json_file, indent=4)
 
-        print("Document saved: meeting_minutes.docx")
+    DocumentManager.save_to_docx(meeting_info, document_filename)
+    print("Document saved: %s" % document_filename)
 
+    print("Do you want to see the meeting information? (yes/no): ")
+    show_info = input()
+    if show_info.lower() == 'yes':
         print("\nMeeting Information:")
         for section, content in meeting_info.items():
             print(f"{section.title().replace('_', ' ')}:\n{content}\n")
 
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    # After analyzing the meeting, add the following code to delete the intermediate video and audio files:
+    if os.path.exists(video_filename):
+        os.remove(video_filename)
+        print(f"Deleted intermediate video file: {video_filename}")
+
+    if os.path.exists(audio_filename):
+        os.remove(audio_filename)
+        print(f"Deleted intermediate audio file: {audio_filename}")
 
 
 if __name__ == "__main__":

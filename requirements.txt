@@ -2,3 +2,5 @@ requests
 python-docx
 openai
 ffmpeg-python
+pytube
+python-slugify
