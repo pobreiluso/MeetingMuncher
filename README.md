@@ -52,3 +52,60 @@ Set your OpenAI API key as an environment variable:
 
     ```sh
     export OPENAI_API_KEY='your_openai_api_key'
+
+
+Example output:
+
+```Beginning video transcription process for run d1284eee-2ada-4215-b23a-1061ad5fb104
+Downloading video:   0%|                                                                                                                                                              | 0/100 [00:00<?, ?%Downloading video: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:03<00:00, 26.15%Downloading video: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:03<00:00, 26.15%/s]
+Extracting audio: 100%|█████████████████████████████████████████████| 100/100 [00:01<00:00, 65.02%/s]
+Transcribing Audio: 100%|███████████████████████████████████████████| 100/100 [00:06<00:00, 15.11%/s]
+Traceback (most recent call last):
+  File "/Users/ajerez/Documents/work/taylorbox/MeetingMuncher/meeting_minutes.py", line 215, in <module>
+
+  File "/Users/ajerez/Documents/work/taylorbox/MeetingMuncher/meeting_minutes.py", line 183, in main
+
+AttributeError: 'dict' object has no attribute 'meeting_title'
+❯ python3 meeting_minutes.py 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 https://www.youtube.com/watch\?v\=H5v3kku4y6Q
+Beginning video transcription process for run 2109d5e2-88d5-43fe-8eca-0e8ade4c09e1
+Downloading video: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:03<00:00, 26.01%/s]
+Extracting audio: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:01<00:00, 70.98%/s]
+Transcribing Audio: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 100/100 [00:06<00:00, 14.75%/s]
+Document saved: downloads/exploring-change-and-connection-lyrics-from-as-it-was.docx
+Do you want to see the meeting information? (yes/no):
+yes
+
+Meeting Information:
+Meeting Title:
+"Exploring Change and Connection: Lyrics from 'As It Was'"
+
+Abstract Summary:
+The text appears to be the lyrics of a song that expresses a sense of longing and change. The speaker addresses someone named Harry, urging him to acknowledge the shift in their world and the isolation they feel. There's a recurring theme of disconnection, with references to unanswered phone calls and a solitary existence. The lyrics also touch upon themes of concern for well-being and the desire to escape from the past, possibly hinting at a complicated relationship with a father figure and a wish to avoid discussing previous events. The refrain "As it was" suggests a nostalgic reflection on how things have changed from the past to the present.
+
+Key Points:
+The main points of the text appear to be lyrics from a song that deals with themes of change, isolation, and concern for someone named Harry. Here are the main points:
+
+1. A call to Harry to acknowledge that he is irreplaceable and that the speaker is the one who remains constant.
+2. Recognition that the world has changed; it's just the two of them, and it's not the same as before.
+3. Concern for Harry's well-being, questioning his solitude and hinting at possible substance use ("What kind of pills do you want?").
+4. Mention of Harry's father living alone and wanting to ensure Harry is well.
+5. A suggestion for Harry to adapt to modern life ("Go home, get ahead light, speed internet").
+6. A desire to avoid discussing the past or who did things first, possibly indicating a wish to move on from previous events or conflicts.
+7. Repetition of the phrase "As it was," emphasizing the change from past to present.
+
+Action Items:
+It seems you've provided lyrics from a song, which typically do not contain direct action items. However, if you're looking to derive tasks from the thematic elements of the song, here are some potential action items:
+
+1. Reach out to Harry to ensure he's not feeling isolated ("Answer the phone Harry, you're no good alone").
+2. Check on the well-being of a family member who lives alone ("Your daddy lives by himself He just wants to know that you're well").
+3. Consider upgrading to high-speed internet if it's necessary for your home or work life ("Go home, get a head light, speed internet").
+4. Reflect on changes in life and adapt to them ("You know it's not the same as it was").
+5. Engage in a conversation about the past only if it's constructive and not detrimental to your well-being ("I don't want to talk about the way that it was").
+
+Please note that these are interpretive actions based on the content of the song and not explicit instructions.
+
+Sentiment:
+The sentiment of the text, which appears to be lyrics from a song, conveys a mix of nostalgia, concern, and a sense of change. The repetition of "You know it's not the same as it was" suggests a longing for the past or a recognition that things have changed, possibly for the worse. The lines "Answer the phone Harry, you're no good alone" and "Your daddy lives by himself He just wants to know that you're well" indicate worry for someone's well-being, suggesting that the person may be isolated or struggling. The overall sentiment seems to be a blend of melancholy and care, with an undercurrent of the inevitability of change.
+
+Deleted intermediate video file: downloads/2109d5e2-88d5-43fe-8eca-0e8ade4c09e1.mp4
+Deleted intermediate audio file: downloads/2109d5e2-88d5-43fe-8eca-0e8ade4c09e1.mp3
